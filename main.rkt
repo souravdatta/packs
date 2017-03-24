@@ -10,7 +10,9 @@
          pfail?
          Pack-or
          do+
-         do<>)
+         do<>
+         PackF
+         comp+)
 
 (define-type (Pack-Content a) (U a False))
 
@@ -38,8 +40,8 @@
   (false? (Pack-content m)))
 
 (: Pack-or (All (a) (-> (Pack a)
-                         (Pack a)
-                         (Pack a))))
+                        (Pack a)
+                        (Pack a))))
 (define (Pack-or m1 m2)
   (if (pfail? m1)
       m2
@@ -58,4 +60,20 @@
      #'(mond-binder val-decl (λ ([var-decl : var-type]) (do<> (mond-binder mond-return) e2 ...))))
     ([_ (mond-binder:id mond-return:id) ((~literal <<) val-decl:expr)]
      #'(mond-return val-decl))))
+
+(define-type (PackF a) (-> a (Pack a)))
+	 
+(: comp+ (All (a) (->* ((PackF a)) () #:rest (PackF a)
+                       (PackF a))))
+(define (comp+ f1 . restfs)
+  (lambda ([x : a])
+    (call/cc (lambda ([ret : (-> (Pack a) Void)])
+               (for ([f : (PackF a) (cons f1 restfs)])
+                 (let* ([result (f x)]
+                        [result-content (Pack-content result)])
+                   (if (not result-content)
+                       (ret (return #f))
+                       (set! x result-content))))
+               (return x)))))
+			   
 
