@@ -36,3 +36,8 @@
 (define process (comp+ (process-bag 'uae)
                        move-to-loading
                        retrieve-tag))
+
+(define p1 (pmap/pack process '((a b) (battery c) (c p))))
+
+(define p2 (pmap/pack process (in-vector #{'#((a b) (battery c) (c p)) :: (Vectorof Bag)})))
+

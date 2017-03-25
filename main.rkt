@@ -12,7 +12,8 @@
          do+
          do<>
          PackF
-         comp+)
+         comp+
+         pmap/pack)
 
 (define-type (Pack-Content a) (U a False))
 
@@ -75,5 +76,11 @@
                        (ret (return #f))
                        (set! x result-content))))
                (return x)))))
+
+(: pmap/pack (All (a b)
+                 (-> (PackF a) (Sequenceof a) (Sequenceof (Pack a)))))
+(define (pmap/pack f seq)
+  (sequence-map f seq))
+
 			   
 
